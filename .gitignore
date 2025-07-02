@@ -1,0 +1,11 @@
+# Ignorar archivos y carpetas generadas automáticamente
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env/
+.venv/
+
+# Ignorar carpetas de entrada y salida
+data/
+procesados/
