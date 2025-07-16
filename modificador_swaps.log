@@ -1,0 +1,6 @@
+2025-07-16 16:13:47,027 - INFO - Archivos cargados correctamente.
+2025-07-16 16:13:47,028 - ERROR - Error modificando flujos: 'nro_papeleta'
+2025-07-16 16:13:47,028 - ERROR - Proceso terminado con error: 'nro_papeleta'
+2025-07-16 16:15:04,835 - INFO - Archivos cargados correctamente.
+2025-07-16 16:15:04,838 - INFO - Archivo de flujos modificado correctamente.
+2025-07-16 16:15:04,838 - INFO - Archivo guardado en procesados/flujos_swap_gbo_20250603.csv
