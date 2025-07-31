@@ -1,45 +1,50 @@
 import os
 import unicodedata
+import logging
 
-# Carpetas
-INPUT_FOLDER = 'data'
-OUTPUT_FOLDER = 'procesados'
+# Configura el logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
-# Asegura que la carpeta de salida exista
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-
+# Función para limpiar caracteres especiales
 def limpiar_texto(texto):
     """
-    Normaliza texto quitando tildes y reemplazando Ñ por N.
+    Normaliza texto:
+      - Cambia ñ/Ñ por n/N
+      - Quita tildes de vocales
     """
-    texto = texto.replace('Ñ', 'N').replace('ñ', 'n')
-    texto = unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('utf-8')
+    # Reemplaza ñ/Ñ por n/N
+    texto = texto.replace('ñ', 'n').replace('Ñ', 'N')
+    # Quita tildes usando unicodedata
+    texto = unicodedata.normalize('NFKD', texto)
+    texto = ''.join([c for c in texto if not unicodedata.combining(c)])
     return texto
 
-def procesar_archivo(nombre_archivo):
-    input_path = os.path.join(INPUT_FOLDER, nombre_archivo)
-    output_path = os.path.join(OUTPUT_FOLDER, nombre_archivo)
-
-    with open(input_path, 'r', encoding='utf-8') as entrada, \
-         open(output_path, 'w', encoding='utf-8') as salida:
-
-        for linea in entrada:
-            linea = limpiar_texto(linea)
-            linea = linea.replace(';033;', ';33;')
-            linea = linea.replace(';011001;', ';11001;')
-            salida.write(linea)
-
-    print(f"Archivo procesado: {nombre_archivo}")
-
-def main():
-    archivos = [f for f in os.listdir(INPUT_FOLDER) if f.endswith('.csv')]
-    
+# Función principal para procesar los archivos
+def procesar_archivos(directorio_entrada, directorio_salida):
+    if not os.path.exists(directorio_salida):
+        os.makedirs(directorio_salida)
+        logging.info(f"Carpeta '{directorio_salida}' creada.")
+    archivos = [f for f in os.listdir(directorio_entrada) if os.path.isfile(os.path.join(directorio_entrada, f))]
     if not archivos:
-        print("No hay archivos CSV en la carpeta 'data'.")
+        logging.warning("No hay archivos para procesar.")
         return
 
     for archivo in archivos:
-        procesar_archivo(archivo)
+        entrada_path = os.path.join(directorio_entrada, archivo)
+        salida_path = os.path.join(directorio_salida, archivo)
+        logging.info(f"Procesando archivo: {archivo}")
 
-if __name__ == '__main__':
-    main()
+        with open(entrada_path, 'r', encoding='utf-8') as f_in, \
+             open(salida_path, 'w', encoding='utf-8') as f_out:
+            for linea in f_in:
+                linea = limpiar_texto(linea)
+                linea = linea.replace(';033;', ';33;')
+                linea = linea.replace(';011001;', ';11001;')
+                f_out.write(linea)
+        logging.info(f"Archivo procesado guardado en: {salida_path}")
+
+if __name__ == "__main__":
+    procesar_archivos('data', 'procesados')
